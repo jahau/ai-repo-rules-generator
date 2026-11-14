@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 .env
 .venv/
+.uv-cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+.demo-work/
+.test-tmp*/
