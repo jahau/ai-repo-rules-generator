@@ -210,6 +210,9 @@ Unchanged: .github/copilot-instructions.md
 [exit 0]
 
 $ python generate_rules.py project --agent all
+Detected 3 project(s).
+Unchanged: AGENTS.md
+Unchanged: CLAUDE.md
+Unchanged: .github/copilot-instructions.md
 
-Conflict: AGENTS.md already exists; use --update to preserve manual instructions
-[exit 3]
+[exit 0]
