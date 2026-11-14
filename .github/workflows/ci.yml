@@ -38,5 +38,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest' && matrix.python == '3.11'
         with:
-          name: v0.2.0-distributions
+          name: distributions
           path: dist/*
