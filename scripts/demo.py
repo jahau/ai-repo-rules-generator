@@ -47,7 +47,9 @@ def main() -> None:
         samples.mkdir(parents=True, exist_ok=True)
         for name in ["AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md"]:
             shutil.copyfile(project / name, samples / Path(name).name)
-    (repository / "docs" / "demo.txt").write_text("\n".join(transcript), encoding="utf-8")
+    (repository / "docs" / "demo.txt").write_text(
+        "\n".join(transcript), encoding="utf-8", newline="\n"
+    )
 
 
 if __name__ == "__main__":
