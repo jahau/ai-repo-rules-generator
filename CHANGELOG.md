@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Rerunning without `--update` on an up-to-date file now reports `Unchanged` and
+  exits 0 instead of a conflict; existing files are still never modified.
+- Multi-file writes are all-or-nothing: updates are staged first, and any failure
+  rolls back completed writes and removes newly created directories.
+
 ## 0.2.0 — release candidate
 
 - Add Codex, Claude Code, and GitHub Copilot output adapters with shared rules.

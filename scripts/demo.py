@@ -22,7 +22,7 @@ def main() -> None:
             ["--agent", "all", "--update"],
             ["--agent", "all"],
         ]
-        for arguments, expected_exit in zip(commands, [0, 0, 0, 0, 3], strict=True):
+        for arguments, expected_exit in zip(commands, [0, 0, 0, 0, 0], strict=True):
             transcript.append("$ python generate_rules.py project " + " ".join(arguments))
             result = subprocess.run(
                 [

@@ -69,8 +69,19 @@ def plan(root: Path, relative: str, body: str, update: bool) -> Change:
     generated = block(body)
     if before is None:
         return Change(path, None, generated.encode("utf-8"))
-    if not update:
+    if update:
+        return Change(path, before, _merge(relative, before, generated))
+    # Without --update an existing file is never modified; an identical result is fine.
+    try:
+        after: bytes | None = _merge(relative, before, generated)
+    except Conflict:
+        after = None
+    if after != before:
         raise Conflict(f"{relative} already exists; use --update to preserve manual instructions")
+    return Change(path, before, before)
+
+
+def _merge(relative: str, before: bytes, generated: str) -> bytes:
     try:
         original = before.decode("utf-8")
     except UnicodeError as exc:
@@ -84,9 +95,7 @@ def plan(root: Path, relative: str, body: str, update: bool) -> Change:
             if not original or original.endswith(newline * 2)
             else (newline if original.endswith(newline) else newline * 2)
         )
-        return Change(
-            path, before, (original + separator + generated.replace("\n", newline)).encode("utf-8")
-        )
+        return (original + separator + generated.replace("\n", newline)).encode("utf-8")
     matches = list(START_RE.finditer(normalized))
     if len(matches) != 1 or normalized.count(PREFIX) != 1 or normalized.count(END) != 1:
         raise Conflict(f"{relative}: malformed or duplicate generated markers; resolve manually")
@@ -102,36 +111,91 @@ def plan(root: Path, relative: str, body: str, update: bool) -> Change:
     end_raw = original.index(END) + len(END)
     newline = "\r\n" if original[body_start - 2 : body_start] == "\r\n" else "\n"
     replacement = generated.rstrip("\n").replace("\n", newline)
-    return Change(
-        path, before, (original[:start_raw] + replacement + original[end_raw:]).encode("utf-8")
-    )
+    return (original[:start_raw] + replacement + original[end_raw:]).encode("utf-8")
+
+
+def _stage(path: Path, data: bytes, mode: int) -> str:
+    """Write ``data`` to a temporary sibling of ``path`` and return its name."""
+    fd, temporary = tempfile.mkstemp(prefix=".ai-repo-rules-", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(data)
+        os.chmod(temporary, mode)
+    except BaseException:
+        os.unlink(temporary)
+        raise
+    return temporary
 
 
 def write_changes(root: Path, changes: list[Change]) -> None:
+    """Apply all changes or none: a failure rolls back every completed write."""
+    pending = [change for change in changes if change.changed]
     # Validate the complete plan again before any mutation.
-    for change in changes:
+    for change in pending:
         safe_destination(root, change.path)
         current = change.path.read_bytes() if change.path.exists() else None
         if current != change.before:
             raise Conflict(f"{change.path.relative_to(root)} changed since planning; retry")
-    for change in changes:
-        if not change.changed:
-            continue
-        change.path.parent.mkdir(parents=True, exist_ok=True)
-        safe_destination(root, change.path)
-        if change.before is None:
-            # Exclusive creation never clobbers a concurrently created destination.
-            with change.path.open("xb") as stream:
-                stream.write(change.after)
-        else:
-            fd, temporary = tempfile.mkstemp(prefix=".ai-repo-rules-", dir=change.path.parent)
-            try:
-                with os.fdopen(fd, "wb") as stream:
+    created_dirs: list[Path] = []
+    staged: dict[Path, str] = {}
+    done: list[Change] = []
+    try:
+        # Stage every update first so most failures happen before anything is visible.
+        for change in pending:
+            for directory in reversed(change.path.parents):
+                if not directory.exists():
+                    directory.mkdir()
+                    created_dirs.append(directory)
+            safe_destination(root, change.path)
+            if change.before is not None:
+                staged[change.path] = _stage(change.path, change.after, change.path.stat().st_mode)
+        for change in pending:
+            if change.before is None:
+                # Exclusive creation never clobbers a concurrently created destination.
+                with change.path.open("xb") as stream:
+                    done.append(change)
                     stream.write(change.after)
-                os.chmod(temporary, change.path.stat().st_mode)
+            else:
                 if change.path.read_bytes() != change.before:
                     raise Conflict(f"{change.path.name} changed during generation; retry")
-                os.replace(temporary, change.path)
-            finally:
-                if os.path.exists(temporary):
-                    os.unlink(temporary)
+                os.replace(staged[change.path], change.path)
+                del staged[change.path]
+                done.append(change)
+    except BaseException as exc:
+        _discard(staged)
+        failures = _rollback(done, created_dirs)
+        if failures:
+            exc.add_note("Rollback incomplete; inspect manually: " + ", ".join(failures))
+        raise
+    finally:
+        _discard(staged)
+
+
+def _discard(staged: dict[Path, str]) -> None:
+    for temporary in staged.values():
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    staged.clear()
+
+
+def _rollback(done: list[Change], created_dirs: list[Path]) -> list[str]:
+    failures: list[str] = []
+    for change in reversed(done):
+        try:
+            if change.before is None:
+                change.path.unlink(missing_ok=True)
+            else:
+                temporary = _stage(change.path, change.before, change.path.stat().st_mode)
+                try:
+                    os.replace(temporary, change.path)
+                finally:
+                    if os.path.exists(temporary):
+                        os.unlink(temporary)
+        except OSError:
+            failures.append(str(change.path))
+    for directory in reversed(created_dirs):
+        try:
+            directory.rmdir()
+        except OSError:
+            failures.append(str(directory))
+    return failures

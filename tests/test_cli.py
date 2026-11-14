@@ -15,6 +15,8 @@ def test_outputs_and_idempotent_updates(tmp_path, agent):
     before = {name: (tmp_path / name).read_bytes() for name in expected}
     assert main([str(tmp_path), "--agent", agent, "--update"]) == 0
     assert before == {name: (tmp_path / name).read_bytes() for name in expected}
+    assert main([str(tmp_path), "--agent", agent]) == 0
+    assert before == {name: (tmp_path / name).read_bytes() for name in expected}
 
 
 @pytest.mark.parametrize("flag", ["--dry-run", "--diff"])

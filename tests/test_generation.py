@@ -82,3 +82,51 @@ def test_linked_parent_rejected(tmp_path):
         pytest.skip("Symlink privileges unavailable")
     with pytest.raises(Conflict, match="linked destination"):
         plan(tmp_path, ".github/copilot-instructions.md", "New\n", True)
+
+
+def test_identical_existing_file_is_unchanged_without_update(tmp_path):
+    path = tmp_path / "AGENTS.md"
+    path.write_text("# Manual\n\n" + block("Same\n"), encoding="utf-8")
+    assert not plan(tmp_path, "AGENTS.md", "Same\n", False).changed
+    with pytest.raises(Conflict, match="already exists"):
+        plan(tmp_path, "AGENTS.md", "Different\n", False)
+
+
+def test_failed_write_rolls_back_every_file(tmp_path, monkeypatch):
+    manual = tmp_path / "CLAUDE.md"
+    manual.write_bytes(b"Manual\r\n")
+    changes = [
+        plan(tmp_path, ".github/copilot-instructions.md", "New\n", True),
+        plan(tmp_path, "AGENTS.md", "New\n", True),
+        plan(tmp_path, "CLAUDE.md", "New\n", True),
+    ]
+
+    def failing_replace(*args):
+        raise PermissionError("Denied")
+
+    monkeypatch.setattr("ai_repo_rules.generation.os.replace", failing_replace)
+    with pytest.raises(PermissionError):
+        write_changes(tmp_path, changes)
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["CLAUDE.md"]
+    assert manual.read_bytes() == b"Manual\r\n"
+
+
+def test_rollback_restores_already_replaced_files(tmp_path, monkeypatch):
+    for name in ("AGENTS.md", "CLAUDE.md"):
+        (tmp_path / name).write_text(f"Manual {name}\n", encoding="utf-8")
+    changes = [plan(tmp_path, name, "New\n", True) for name in ("AGENTS.md", "CLAUDE.md")]
+    real_replace = os.replace
+    calls = []
+
+    def flaky_replace(source, destination):
+        calls.append(destination)
+        if len(calls) == 2:
+            raise PermissionError("Denied")
+        real_replace(source, destination)
+
+    monkeypatch.setattr("ai_repo_rules.generation.os.replace", flaky_replace)
+    with pytest.raises(PermissionError):
+        write_changes(tmp_path, changes)
+    for name in ("AGENTS.md", "CLAUDE.md"):
+        assert (tmp_path / name).read_text(encoding="utf-8") == f"Manual {name}\n"
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["AGENTS.md", "CLAUDE.md"]

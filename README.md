@@ -59,7 +59,8 @@ the generator does not create separate instruction files in every package.
 
 ## Safe updates
 
-By default, an existing destination is a conflict, even if its contents match.
+By default, an existing destination is never modified: a file that is already up
+to date is reported as unchanged, and any other existing file is a conflict.
 `--update` appends a generated section to a manual-only file or refreshes an
 existing, unedited generated section. Text outside the markers is preserved,
 including Unicode, BOMs, and line endings. Repeated updates are idempotent.
@@ -71,8 +72,10 @@ and restore its original content from version control, or remove both markers
 while retaining all text to treat the whole file as manual content on the next
 update. Review the diff for duplicated guidance in that case.
 
-All destinations are checked before any writes. Existing files are updated using
-a temporary file and atomic replacement; new files use exclusive creation.
+All destinations are checked before any writes, and writes are all-or-nothing.
+Updates are first staged as temporary files, then applied with atomic replacement;
+new files use exclusive creation. If any write fails, completed writes are rolled
+back and newly created directories are removed.
 Symlinks, Windows reparse points, and hard-linked destinations are refused.
 `--force` is accepted for compatibility but now means safe `--update`, with a
 warning; there is no destructive overwrite option.
@@ -118,7 +121,7 @@ Preview only; no files written.
 ```
 
 Run `python scripts/demo.py` to capture the full session again, including unified
-diffs, generation, an unchanged update, and an existing-file conflict. It uses a
+diffs, generation, an unchanged update, and an unchanged rerun without `--update`. It uses a
 temporary copy of [examples/monorepo](examples/monorepo) and writes the transcript
 and sample files under `docs/`.
 
@@ -148,8 +151,8 @@ Full generated samples:
   claimed to have passed. This tool does not validate assistant behavior.
 - UTF-8 instruction files are required. Manual instructions can contradict generated
   guidance; semantic conflict resolution remains a human review task.
-- Writes are atomic per updated file, not a multi-file transaction. An I/O failure
-  can leave a subset completed. Avoid concurrent edits during generation: snapshot
+- Failed writes are rolled back, but a crash or power loss during the brief apply
+  phase can still leave a subset completed. Avoid concurrent edits during generation: snapshot
   checks detect ordinary changes, but there is no cross-process lock or protection
   against a malicious process changing filesystem paths during the write window.
 
@@ -160,7 +163,7 @@ Full generated samples:
 | `0` | Generated, unchanged, or preview completed | Review output; detection warnings may still need attention |
 | `2` | Invalid arguments or project path | Check `--help` and the directory |
 | `3` | Existing file, edited block, or unsafe destination | Inspect the file; use `--update --diff` or resolve the reported conflict |
-| `4` | Filesystem I/O failure | Check permissions and disk space; inspect any completed writes before retrying |
+| `4` | Filesystem I/O failure | Check permissions and disk space; completed writes are rolled back; a rollback failure lists files to inspect |
 
 Missing commands usually mean evidence is absent or the package manager is
 ambiguous. Keep only the intended lockfile/manager declaration and rerun. The tool
