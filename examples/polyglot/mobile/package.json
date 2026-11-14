@@ -1,0 +1,6 @@
+{
+  "name": "sample-mobile",
+  "packageManager": "npm@10.0.0",
+  "dependencies": {"react": "*", "react-native": "*"},
+  "scripts": {"test": "node --test"}
+}

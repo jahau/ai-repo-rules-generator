@@ -1,0 +1,5 @@
+{
+  "name": "sample/wordpress",
+  "require": {"roots/wordpress": "*"},
+  "scripts": {"lint": "php -l index.php"}
+}

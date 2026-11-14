@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ['3.11', '3.12', '3.13', '3.14']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e ".[dev]" build
+      - run: python -m pytest -q
+      - run: ruff check ai_repo_rules tests scripts generate_rules.py
+      - run: ruff format --check ai_repo_rules tests scripts generate_rules.py
+      - run: mypy ai_repo_rules
+      - run: python -m build
+      - name: Install wheel and exercise entry point outside checkout
+        shell: bash
+        run: |
+          python -m pip uninstall -y ai-repo-rules-generator
+          python -m pip install dist/*.whl
+          cd "$RUNNER_TEMP"
+          ai-repo-rules --version
+          ai-repo-rules "$GITHUB_WORKSPACE/examples/monorepo" --agent all --diff
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.11'
+        with:
+          name: v0.2.0-distributions
+          path: dist/*

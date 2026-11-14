@@ -1,0 +1,7 @@
+[project]
+name = "sample-api"
+version = "0.0.0"
+dependencies = ["fastapi"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

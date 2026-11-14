@@ -138,6 +138,43 @@ def test_oversized_config(tmp_path):
     assert "oversized" in scan(tmp_path).warnings[0]
 
 
+def test_invalid_toml_and_wrong_tool_types(tmp_path):
+    put(tmp_path, "pyproject.toml", "invalid TOML")
+    assert scan(tmp_path).warnings
+    put(tmp_path, "pyproject.toml", '[tool]\npytest = "not configuration"')
+    assert not scan(tmp_path).projects[0].commands
+
+
+def test_scan_limits_warn(tmp_path, monkeypatch):
+    put(tmp_path, "nested/deeper/go.mod")
+    monkeypatch.setattr("ai_repo_rules.detection.MAX_DEPTH", 1)
+    assert any("Depth limit" in warning for warning in scan(tmp_path).warnings)
+    monkeypatch.setattr("ai_repo_rules.detection.MAX_FILES", 0)
+    put(tmp_path, "source.py")
+    assert any("File limit" in warning for warning in scan(tmp_path).warnings)
+
+
+def test_windows_reparse_point_is_link(tmp_path, monkeypatch):
+    import stat
+    from types import SimpleNamespace
+
+    from ai_repo_rules.detection import is_link
+
+    monkeypatch.setattr(
+        Path,
+        "lstat",
+        lambda self: SimpleNamespace(
+            st_mode=stat.S_IFDIR, st_file_attributes=stat.FILE_ATTRIBUTE_REPARSE_POINT
+        ),
+    )
+    assert is_link(tmp_path)
+
+
+def test_case_insensitive_exclusions(tmp_path):
+    put(tmp_path, "NODE_MODULES/package.json", "{}")
+    assert len(scan(tmp_path).projects) == 1
+
+
 def test_symlink_not_scanned(tmp_path):
     target = tmp_path / "excluded"
     target.mkdir()

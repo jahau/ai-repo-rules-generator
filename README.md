@@ -1,20 +1,186 @@
 # AI Repo Rules Generator
 
-A small, dependency-free CLI that detects a repository's technology stack and generates a **reviewable** `AGENTS.md` draft. It does not overwrite existing instructions unless `--force` is supplied.
+Give your coding assistant instructions grounded in your repository—without
+uploading code or replacing the rules your team already maintains.
 
-## Usage
+**One local scan. Three assistant formats. Review every change before writing.**
+AI Repo Rules Generator finds project boundaries, technologies, and configured
+checks, then creates a conservative instruction draft. It has no runtime
+dependencies, makes no API calls, and never executes project scripts.
 
-```bash
-python generate_rules.py /path/to/project
-python generate_rules.py /path/to/project --force
+## Install
+
+Requires Python 3.11 or newer on Windows, Linux, or macOS. From a checkout:
+
+```sh
+git clone https://github.com/jahau/ai-repo-rules-generator.git
+cd ai-repo-rules-generator
+python -m pip install .
+ai-repo-rules --version
 ```
 
-Review the generated instructions before committing them. Do not include secrets in prompts or generated rules.
+Version 0.2.0 is prepared in this repository; package-index publication is not
+assumed. You can also run directly without installing:
 
-## Roadmap
-- `CLAUDE.md` and `.github/copilot-instructions.md` templates
-- Existing-instruction merging without duplicate rules
-- Better monorepo detection and configurable project policies
-- Tests, examples and CLI packaging
+```sh
+python generate_rules.py /path/to/project
+python -m ai_repo_rules /path/to/project
+```
 
-MIT License. Contributions welcome.
+## Preview, generate, update
+
+```sh
+# Inspect the proposed contents; neither command writes files.
+ai-repo-rules /path/to/project --agent all --dry-run
+ai-repo-rules /path/to/project --agent all --diff
+
+# Generate all three instruction files.
+ai-repo-rules /path/to/project --agent all
+
+# Preview updates while preserving manually maintained instructions.
+ai-repo-rules /path/to/project --agent all --update --diff
+ai-repo-rules /path/to/project --agent all --update
+```
+
+Quote paths containing spaces, including Windows paths such as
+`ai-repo-rules "C:\Projects\My App" --diff`. The project defaults to the current
+directory and the agent defaults to `codex`.
+
+| Agent option | Output relative to the project root |
+| --- | --- |
+| `--agent codex` | `AGENTS.md` |
+| `--agent claude` | `CLAUDE.md` |
+| `--agent copilot` | `.github/copilot-instructions.md` |
+| `--agent all` | All three files |
+
+All adapters use the same evidence and workflow rules. Nested projects appear as
+scoped sections with their working directories in each root instruction file;
+the generator does not create separate instruction files in every package.
+
+## Safe updates
+
+By default, an existing destination is a conflict, even if its contents match.
+`--update` appends a generated section to a manual-only file or refreshes an
+existing, unedited generated section. Text outside the markers is preserved,
+including Unicode, BOMs, and line endings. Repeated updates are idempotent.
+
+Generated sections have SHA-256 checksums. Editing a generated section, deleting
+one of its markers, or duplicating markers causes a conflict. Keep custom rules
+outside the markers. To resolve a conflict, move your edits outside the section
+and restore its original content from version control, or remove both markers
+while retaining all text to treat the whole file as manual content on the next
+update. Review the diff for duplicated guidance in that case.
+
+All destinations are checked before any writes. Existing files are updated using
+a temporary file and atomic replacement; new files use exclusive creation.
+Symlinks, Windows reparse points, and hard-linked destinations are refused.
+`--force` is accepted for compatibility but now means safe `--update`, with a
+warning; there is no destructive overwrite option.
+
+## Detection support
+
+| Ecosystem | Evidence and scope |
+| --- | --- |
+| Python | `.py`, `pyproject.toml`, `requirements.txt`; Django, Flask, FastAPI from declared metadata; Poetry/uv/Pipenv evidence |
+| JavaScript / TypeScript | Source extensions, `package.json`, TypeScript dependency; npm, pnpm, yarn, bun from lockfiles or `packageManager` |
+| React / Next.js / React Native | Exact dependency names in `package.json` |
+| PHP / WordPress | `.php`, Composer; WordPress Composer packages or `wp-config.php` / `wp-config-sample.php` filenames only |
+| Go | `.go`, `go.mod`, Go modules |
+| Rust | `.rs`, `Cargo.toml`, Cargo |
+| Java | `.java`, `pom.xml`, Gradle manifests; Maven/Gradle |
+| C# | `.cs`, `.csproj`, NuGet |
+| Ruby (legacy support) | `.rb`, `Gemfile`, Bundler |
+
+Every directory containing a supported manifest is a project boundary. Source
+extensions belong to the nearest enclosing project. This works without Git and
+finds nested projects even when they are not listed in a workspace manifest.
+
+Check discovery supports test/lint/check/typecheck/format script names in
+`package.json` and `composer.json`. Script bodies are never copied into output.
+JavaScript scripts require an unambiguous package manager in the same directory.
+Explicit pytest and Ruff configuration in `pyproject.toml` yields standard tool
+invocations, labelled as configured but unverified. Tools need not be installed.
+Other language manifests identify the stack but do **not** cause guessed test,
+build, or lint commands to be emitted.
+
+## Real terminal demo and sample output
+
+This excerpt is from the reproducible CLI session in [docs/demo.txt](docs/demo.txt):
+
+```text
+$ python generate_rules.py project --agent all --dry-run
+Detected 3 project(s).
+Would Create: AGENTS.md
+Would Create: CLAUDE.md
+Would Create: .github/copilot-instructions.md
+Preview only; no files written.
+[exit 0]
+```
+
+Run `python scripts/demo.py` to capture the full session again, including unified
+diffs, generation, an unchanged update, and an existing-file conflict. It uses a
+temporary copy of [examples/monorepo](examples/monorepo) and writes the transcript
+and sample files under `docs/`.
+
+Full generated samples:
+[AGENTS.md](docs/samples/AGENTS.md), [CLAUDE.md](docs/samples/CLAUDE.md),
+[Copilot instructions](docs/samples/copilot-instructions.md).
+
+## Privacy and limitations
+
+- The CLI has no network client, telemetry, or external model integration. Package
+  installation can use the network; repository scanning and generation do not.
+- Scanning reads only `package.json`, `composer.json`, and `pyproject.toml` content.
+  Other evidence uses filenames/extensions only. It does not read `.env`, source
+  code, lockfile contents, or WordPress configuration contents. Do not embed secrets
+  in manifest keys or directory names; names can appear in generated evidence.
+- Hidden directories and common dependencies, caches, build artifacts, Git metadata,
+  and secret directories are excluded. See `EXCLUDED` in `detection.py` for the list.
+  Gitignore rules and custom artifact directories are not interpreted. Only
+  allowlisted configuration content is read even in other directories.
+- Scan limits are 50,000 files, depth 30, and 1 MB per configuration file. Unreadable,
+  oversized, or malformed configuration produces warnings where encountered.
+- No dependency resolution, source analysis, shell parsing, CI command extraction,
+  inherited workspace-manager inference, or arbitrary task-runner parsing occurs.
+  Standalone WordPress plugins/themes without recognized metadata may appear as PHP.
+- Manifest presence is evidence, not proof of a working build. Generated drafts can
+  include fixture projects; review their relevance. Commands are never executed or
+  claimed to have passed. This tool does not validate assistant behavior.
+- UTF-8 instruction files are required. Manual instructions can contradict generated
+  guidance; semantic conflict resolution remains a human review task.
+- Writes are atomic per updated file, not a multi-file transaction. An I/O failure
+  can leave a subset completed. Avoid concurrent edits during generation: snapshot
+  checks detect ordinary changes, but there is no cross-process lock or protection
+  against a malicious process changing filesystem paths during the write window.
+
+## Troubleshooting and exit codes
+
+| Exit | Meaning | Action |
+| --- | --- | --- |
+| `0` | Generated, unchanged, or preview completed | Review output; detection warnings may still need attention |
+| `2` | Invalid arguments or project path | Check `--help` and the directory |
+| `3` | Existing file, edited block, or unsafe destination | Inspect the file; use `--update --diff` or resolve the reported conflict |
+| `4` | Filesystem I/O failure | Check permissions and disk space; inspect any completed writes before retrying |
+
+Missing commands usually mean evidence is absent or the package manager is
+ambiguous. Keep only the intended lockfile/manager declaration and rerun. The tool
+does not add missing dependencies or configuration for you.
+
+## Development and release
+
+```sh
+python -m pip install -e ".[dev]" build
+python -m pytest -q
+ruff check ai_repo_rules tests scripts generate_rules.py
+ruff format --check ai_repo_rules tests scripts generate_rules.py
+mypy ai_repo_rules
+python -m build
+```
+
+The CI matrix covers Python 3.11–3.14 on Windows, Linux, and macOS, with wheel
+installation and an out-of-checkout CLI smoke test. Tests cover detection,
+previews, legacy invocation, conflict handling, manual-text preservation, unsafe
+paths, and offline execution. Symlink tests skip if the host cannot create links.
+
+See [CHANGELOG.md](CHANGELOG.md) and the
+[v0.2.0 release checklist](docs/release-v0.2.0.md). MIT licensed.

@@ -1,0 +1,6 @@
+include CHANGELOG.md
+include generate_rules.py
+recursive-include tests *.py
+recursive-include examples *.json *.toml *.mod *.xml *.csproj *.md
+recursive-include docs *.md *.txt
+recursive-include scripts *.py

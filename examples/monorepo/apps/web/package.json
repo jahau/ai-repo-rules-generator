@@ -1,0 +1,8 @@
+{
+  "name": "sample-web",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "dependencies": {"next": "*", "react": "*"},
+  "devDependencies": {"typescript": "*"},
+  "scripts": {"test": "node --test", "lint": "tsc --noEmit"}
+}

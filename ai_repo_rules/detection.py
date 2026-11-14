@@ -88,6 +88,7 @@ EXTENSIONS = {
 MAX_CONFIG_BYTES = 1_000_000
 MAX_FILES = 50_000
 MAX_DEPTH = 30
+EXCLUDED_CASEFOLD = {name.casefold() for name in EXCLUDED}
 
 
 def is_link(path: Path) -> bool:
@@ -227,7 +228,7 @@ def _detect(directory: Path, names: set[str], root: Path, warnings: list[str]) -
                 project.managers.add("uv")
             # These are configured tool invocations, never assumptions based on language.
             for key, command in {"pytest": "python -m pytest", "ruff": "ruff check ."}.items():
-                if key in tool:
+                if isinstance(tool.get(key), dict):
                     project.commands.append((command, f"{name} [tool.{key}]"))
     return project
 
@@ -246,8 +247,9 @@ def scan(root: Path) -> Scan:
         dirs[:] = sorted(
             d
             for d in dirs
-            if d.casefold() not in {name.casefold() for name in EXCLUDED}
-            and not d.startswith(".") and not is_link(directory / d)
+            if d.casefold() not in EXCLUDED_CASEFOLD
+            and not d.startswith(".")
+            and not is_link(directory / d)
         )
         if len(directory.relative_to(root).parts) >= MAX_DEPTH:
             if dirs:
