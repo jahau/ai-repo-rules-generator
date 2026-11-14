@@ -19,8 +19,10 @@ python -m pip install .
 ai-repo-rules --version
 ```
 
-Version 0.2.0 is prepared in this repository; package-index publication is not
-assumed. You can also run directly without installing:
+Prebuilt wheels are attached to each
+[GitHub release](https://github.com/jahau/ai-repo-rules-generator/releases); the
+package is not published to a package index. You can also run directly without
+installing:
 
 ```sh
 python generate_rules.py /path/to/project
@@ -186,4 +188,4 @@ previews, legacy invocation, conflict handling, manual-text preservation, unsafe
 paths, and offline execution. Symlink tests skip if the host cannot create links.
 
 See [CHANGELOG.md](CHANGELOG.md) and the
-[v0.2.0 release checklist](docs/release-v0.2.0.md). MIT licensed.
+[release checklist](docs/releasing.md). MIT licensed.

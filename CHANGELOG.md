@@ -1,13 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 — 2026-11-14
 
 - Rerunning without `--update` on an up-to-date file now reports `Unchanged` and
   exits 0 instead of a conflict; existing files are still never modified.
 - Multi-file writes are all-or-nothing: updates are staged first, and any failure
   rolls back completed writes and removes newly created directories.
 
-## 0.2.0 — release candidate
+## 0.2.0 — 2026-11-14
 
 - Add Codex, Claude Code, and GitHub Copilot output adapters with shared rules.
 - Detect nested projects, source languages, supported frameworks, package managers,
@@ -22,7 +22,6 @@
 
 Compatibility: Python 3.11+ is now required. `--force` remains accepted as a
 deprecated alias for safe `--update`; it no longer deletes manual instructions.
-No package publication or release tag has been made by this change.
 
 ## 0.1.0
 
