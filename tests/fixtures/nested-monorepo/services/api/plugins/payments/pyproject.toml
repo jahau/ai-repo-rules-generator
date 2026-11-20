@@ -1,0 +1,5 @@
+[project]
+name = "payments"
+
+[tool.ruff]
+line-length = 100

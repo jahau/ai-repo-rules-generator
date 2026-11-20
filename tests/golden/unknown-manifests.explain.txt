@@ -1,0 +1,63 @@
+ai-repo-rules explanation (read-only; no files were written)
+Targets: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`
+
+Template lines (not derived from individual observations; the last headings appear only when their section is generated):
+  # Agent instructions
+  # Claude Code instructions
+  # GitHub Copilot instructions
+  Review this locally generated draft before committing.
+  Keep manually maintained instructions outside the generated section.
+  ## Safety and workflow
+  - Read the applicable instructions, README, configuration, and tests before editing.
+  - Make focused changes and preserve existing behavior and manual instructions.
+  - Never print, commit, or copy secrets or private tokens.
+  - Review configured commands before running them; configuration is not trusted code.
+  - Use the environment and tool versions specified by the project.
+  - Run relevant checks when practical; report results and anything unverified.
+  - Do not invent commands, dependencies, or successful test results.
+  ## Detected projects
+
+Scope `.` -> ### `.`
+  Run commands from this project directory.
+      `.` [high]
+        [high] `.`: repository root is always a scope
+  - Languages: `PHP`, `TypeScript`.
+      `PHP` [medium]
+        [medium] `*.php` in `.`: 1 file(s) with this extension; nearest enclosing project
+        [low] `wp-config-sample.php`: filename only; contents are never read
+      `TypeScript` [medium]
+        [medium] `*.ts` in `scripts`: 1 file(s) with this extension; nearest enclosing project
+  - Frameworks: `WordPress`.
+      `WordPress` [low]
+        [low] `wp-config-sample.php`: filename only; contents are never read
+  - Package managers: not detected.
+      no allowlisted observation
+  - Evidence: `wp-config-sample.php (filename only)`.
+      `wp-config-sample.php (filename only)` [low]
+        [low] `wp-config-sample.php`: filename only; contents are never read
+  No unambiguous check commands detected. Inspect project configuration.
+      no allowlisted observation
+
+Scope `known` -> ### `known`
+  Run commands from this project directory.
+      `known` [high]
+        [high] `known/go.mod`: recognized manifest present
+  - Languages: `Go`.
+      `Go` [high]
+        [high] `known/go.mod`: manifest filename
+        [medium] `*.go` in `known`: 1 file(s) with this extension; nearest enclosing project
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: `Go modules`.
+      `Go modules` [high]
+        [high] `known/go.mod`: manifest filename
+  - Evidence: `go.mod`.
+      `go.mod` [high]
+        [high] `known/go.mod`: recognized manifest present
+  No unambiguous check commands detected. Inspect project configuration.
+      no allowlisted observation
+
+Confidence levels:
+  high: declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name
+  medium: inferred from file extensions or from a script-name pattern
+  low: filename-only heuristic that may be coincidental

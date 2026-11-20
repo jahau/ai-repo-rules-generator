@@ -1,0 +1,6 @@
+{
+  "packageManager": "yarn@4.0.0",
+  "scripts": {
+    "test": "FIXTURE_CANARY: contents must never be read or emitted"
+  }
+}
