@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from .detection import scripts_omitted
 from .models import CONFIDENCE_RANK, Observation, Project, Scan
 from .rendering import (
     COMMANDS_INTRO,
@@ -77,20 +78,21 @@ def _project(project: Project) -> dict[str, Any]:
                 "values": [_value(project, attribute, v) for v in values],
             }
         )
-    if project.commands:
-        for command, source in sorted(project.commands):
-            instructions.append(
-                {
-                    "instruction": command_line(command, source),
-                    "field": "commands",
-                    "values": [_value(project, "commands", command)],
-                }
-            )
-    else:
-        omitted = sorted({o.value for o in project.observations if o.field == "omissions"})
+    for command, source in sorted(project.commands):
         instructions.append(
             {
-                "instruction": NO_COMMANDS,
+                "instruction": command_line(command, source),
+                "field": "commands",
+                "values": [_value(project, "commands", command)],
+            }
+        )
+    omitted = sorted({o.value for o in project.observations if o.field == "omissions"})
+    if not project.commands or omitted:
+        # With other commands present, the omission surfaces only as a detection warning.
+        line = NO_COMMANDS if not project.commands else warning_line(scripts_omitted(project.path))
+        instructions.append(
+            {
+                "instruction": line,
                 "field": "omissions",
                 "values": [_value(project, "omissions", v) for v in omitted],
             }
@@ -143,7 +145,8 @@ def to_text(data: dict[str, Any]) -> str:
         "ai-repo-rules explanation (read-only; no files were written)",
         "Targets: " + ", ".join(literal(t["path"]) for t in data["targets"]),
         "",
-        "Fixed template lines (identical for every repository; not derived from observations):",
+        "Template lines (not derived from individual observations; the last headings "
+        "appear only when their section is generated):",
         *(f"  {line}" for line in data["template"]),
     ]
     for project in data["projects"]:

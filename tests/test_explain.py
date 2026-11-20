@@ -215,3 +215,59 @@ def test_ambiguous_managers_are_explained_not_guessed():
     yarn = _values(agreeing, "managers")["yarn"]["observations"]
     assert [o["source"] for o in yarn] == ["agreeing/package.json", "agreeing/yarn.lock"]
     assert _values(agreeing, "commands")["yarn run test"]["confidence"] == "medium"
+
+
+def test_omission_is_explained_even_when_other_commands_exist(tmp_path):
+    (tmp_path / "package.json").write_text('{"scripts":{"test":"x"}}', encoding="utf-8")
+    (tmp_path / "package-lock.json").write_text("", encoding="utf-8")
+    (tmp_path / "yarn.lock").write_text("", encoding="utf-8")
+    (tmp_path / "composer.json").write_text('{"scripts":{"test":"x"}}', encoding="utf-8")
+    result = scan(tmp_path)
+    root = {p["scope"]: p for p in explain(result, ["codex"])["projects"]}["."]
+    omission = [i for i in root["instructions"] if i["field"] == "omissions"]
+    assert (
+        omission[0]["instruction"] == "- `.: package manager missing or ambiguous; scripts omitted`"
+    )
+    assert omission[0]["instruction"] in render(result, "codex").splitlines()
+    assert "ambiguous (npm, yarn)" in omission[0]["values"][0]["observations"][0]["detail"]
+    assert "composer run-script test" in _values(root, "commands")
+
+
+def test_warnings_use_posix_paths(tmp_path):
+    (tmp_path / "packages" / "a").mkdir(parents=True)
+    (tmp_path / "packages" / "a" / "package.json").write_text("{", encoding="utf-8")
+    assert "Invalid configuration: packages/a/package.json" in scan(tmp_path).warnings
+
+
+def test_text_explain_survives_non_utf8_stdout(tmp_path):
+    import subprocess
+    import sys
+
+    (tmp_path / "日本").mkdir()
+    (tmp_path / "日本" / "package.json").write_text("{}", encoding="utf-8")
+    env = {**os.environ, "PYTHONIOENCODING": "cp1252"}
+    result = subprocess.run(
+        [sys.executable, "-m", "ai_repo_rules", str(tmp_path), "--explain"],
+        capture_output=True,
+        env=env,
+    )
+    assert result.returncode == 0, result.stderr
+    assert b"\u65e5\u672c" in result.stdout
+
+
+def test_closed_pipe_is_not_reported_as_io_failure(tmp_path, monkeypatch, capsys):
+    class ClosedPipe:
+        encoding = "utf-8"
+
+        def write(self, text):
+            raise BrokenPipeError
+
+        def flush(self):
+            pass
+
+        def fileno(self):
+            raise ValueError
+
+    monkeypatch.setattr("sys.stdout", ClosedPipe())
+    assert main([str(tmp_path), "--explain"]) == 1
+    assert "I/O error" not in capsys.readouterr().err

@@ -8,6 +8,8 @@
   `--dry-run`, `--diff`, `--update`, and `--force`.
 - Add fixture and golden tests for nested monorepos, unknown manifests, and
   ambiguous package managers. Generated output is unchanged.
+- Detection warnings now use `/` path separators on every platform, so warnings
+  in generated sections and explanations match across Windows and POSIX.
 
 ## 0.2.1 — 2026-11-14
 

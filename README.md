@@ -127,13 +127,15 @@ supporting observation, using repository-relative paths:
 Lines with nothing detected say `no allowlisted observation`. When scripts are
 omitted, the explanation names the cause, for example "the package manager is
 ambiguous (npm, yarn); no invocation is guessed".
-Fixed template lines (title, safety rules, headings) are listed separately as not
-derived from observations. Detection warnings are printed to stderr as usual and
-repeated in the explanation.
+Template lines (title, safety rules, headings) are listed separately as not
+derived from individual observations. Detection warnings are printed to stderr as
+usual and repeated in the explanation. If scripts were omitted in a scope that
+still has other commands, the omission is explained against its warning line.
 
 Output is deterministic: identical repository metadata gives identical text or
 JSON in any checkout location. JSON (`"format": "ai-repo-rules-explain/1"`) has
-sorted keys and ASCII escaping, so it is suitable for diffs and CI checks.
+sorted keys and ASCII escaping, so it is suitable for diffs and CI checks. Text
+mode escapes characters the console encoding cannot represent instead of failing.
 Golden examples for a nested monorepo, unknown manifests, and ambiguous package
 managers live in [tests/golden](tests/golden).
 
@@ -233,6 +235,7 @@ Full generated samples:
 | Exit | Meaning | Action |
 | --- | --- | --- |
 | `0` | Generated, unchanged, preview, or explanation completed | Review output; detection warnings may still need attention |
+| `1` | `--explain` output pipe was closed early (for example `\| head`) | Expected when truncating output; rerun without the pipe for the full explanation |
 | `2` | Invalid arguments or project path | Check `--help` and the directory |
 | `3` | Existing file, edited block, or unsafe destination | Inspect the file; use `--update --diff` or resolve the reported conflict |
 | `4` | Filesystem I/O failure | Check permissions and disk space; completed writes are rolled back; a rollback failure lists files to inspect |

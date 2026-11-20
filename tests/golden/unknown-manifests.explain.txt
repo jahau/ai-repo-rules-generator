@@ -1,7 +1,7 @@
 ai-repo-rules explanation (read-only; no files were written)
 Targets: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`
 
-Fixed template lines (identical for every repository; not derived from observations):
+Template lines (not derived from individual observations; the last headings appear only when their section is generated):
   # Agent instructions
   # Claude Code instructions
   # GitHub Copilot instructions

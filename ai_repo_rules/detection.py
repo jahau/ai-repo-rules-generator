@@ -115,6 +115,11 @@ def is_link(path: Path) -> bool:
     )
 
 
+def scripts_omitted(scope: str) -> str:
+    """Warning text for package.json scripts dropped because no unique manager exists."""
+    return f"{scope}: package manager missing or ambiguous; scripts omitted"
+
+
 def _manifest(name: str) -> bool:
     return name in MANIFESTS or name.endswith(".csproj")
 
@@ -126,11 +131,11 @@ def _read(path: Path, root: Path, warnings: list[str]) -> str | None:
         with path.open("rb") as stream:
             data = stream.read(MAX_CONFIG_BYTES + 1)
         if len(data) > MAX_CONFIG_BYTES:
-            warnings.append(f"Skipped oversized configuration: {path.relative_to(root)}")
+            warnings.append(f"Skipped oversized configuration: {path.relative_to(root).as_posix()}")
             return None
         return data.decode("utf-8-sig")
     except (OSError, UnicodeError):
-        warnings.append(f"Could not read configuration: {path.relative_to(root)}")
+        warnings.append(f"Could not read configuration: {path.relative_to(root).as_posix()}")
         return None
 
 
@@ -197,7 +202,9 @@ def _detect(directory: Path, names: set[str], root: Path, warnings: list[str]) -
         try:
             data = _mapping(tomllib.loads(text) if name.endswith("toml") else json.loads(text))
         except (ValueError, RecursionError):
-            warnings.append(f"Invalid configuration: {(directory / name).relative_to(root)}")
+            warnings.append(
+                f"Invalid configuration: {(directory / name).relative_to(root).as_posix()}"
+            )
             continue
         if name == "package.json":
             _package_json(data, names, source, project, warnings)
@@ -245,7 +252,7 @@ def _package_json(
             data, f"{manager} run", "package.json", project, f"`{manager}` is the only manager"
         )
     elif _mapping(data.get("scripts")):
-        warnings.append(f"{project.path}: package manager missing or ambiguous; scripts omitted")
+        warnings.append(scripts_omitted(project.path))
         problem = f"ambiguous ({', '.join(sorted(managers))})" if managers else "missing"
         project.observe(
             "omissions",
@@ -308,7 +315,7 @@ def scan(root: Path) -> Scan:
         )
         if len(directory.relative_to(root).parts) >= MAX_DEPTH:
             if dirs:
-                warnings.append(f"Depth limit reached: {directory.relative_to(root)}")
+                warnings.append(f"Depth limit reached: {directory.relative_to(root).as_posix()}")
             dirs[:] = []
         names = {f for f in files if not is_link(directory / f)}
         count += len(names)
