@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-11-20
 
 - Add read-only `--explain` (with `--explain-format text|json`). It shows the safe
   metadata observations behind every generated instruction, with confidence and
