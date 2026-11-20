@@ -252,10 +252,12 @@ def test_text_explain_survives_non_utf8_stdout(tmp_path):
         env=env,
     )
     assert result.returncode == 0, result.stderr
-    assert b"\u65e5\u672c" in result.stdout
+    assert rb"\u65e5\u672c" in result.stdout
 
 
 def test_closed_pipe_is_not_reported_as_io_failure(tmp_path, monkeypatch, capsys):
+    import io
+
     class ClosedPipe:
         encoding = "utf-8"
 
@@ -265,8 +267,12 @@ def test_closed_pipe_is_not_reported_as_io_failure(tmp_path, monkeypatch, capsys
         def flush(self):
             pass
 
+        def isatty(self):
+            return False
+
         def fileno(self):
-            raise ValueError
+            # Like a captured stream; Python 3.14 argparse probes this for color support.
+            raise io.UnsupportedOperation("fileno")
 
     monkeypatch.setattr("sys.stdout", ClosedPipe())
     assert main([str(tmp_path), "--explain"]) == 1
