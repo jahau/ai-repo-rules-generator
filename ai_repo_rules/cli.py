@@ -8,6 +8,7 @@ from pathlib import Path
 
 from . import __version__
 from .detection import scan
+from .explain import explain, to_json, to_text
 from .generation import Conflict, plan, write_changes
 from .rendering import OUTPUTS, render
 
@@ -26,8 +27,23 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="deprecated alias for --update; never discards manual content",
     )
+    parser.add_argument(
+        "--explain",
+        action="store_true",
+        help="show which metadata observations produced each generated instruction; "
+        "read-only: never plans, reads, or writes instruction files",
+    )
+    parser.add_argument(
+        "--explain-format",
+        choices=["text", "json"],
+        help="explanation output format (default: text); requires --explain",
+    )
     parser.add_argument("--version", action="version", version=__version__)
     args = parser.parse_args(argv)
+    if args.explain_format and not args.explain:
+        parser.error("--explain-format requires --explain")
+    if args.explain and (args.dry_run or args.diff or args.update or args.force):
+        parser.error("--explain cannot be combined with --dry-run, --diff, --update or --force")
     root = args.project.resolve()
     if not root.is_dir():
         print("Error: project directory not found.", file=sys.stderr)
@@ -39,6 +55,10 @@ def main(argv: list[str] | None = None) -> int:
         for warning in result.warnings:
             print(f"Warning: {warning}", file=sys.stderr)
         agents = list(OUTPUTS) if args.agent == "all" else [args.agent]
+        if args.explain:
+            data = explain(result, agents)
+            print(to_json(data) if args.explain_format == "json" else to_text(data), end="")
+            return 0
         changes = [
             plan(root, OUTPUTS[agent], render(result, agent), args.update or args.force)
             for agent in agents
