@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Add read-only `--explain` (with `--explain-format text|json`). It shows the safe
+  metadata observations behind every generated instruction, with confidence and
+  project scope. It never plans, reads, or writes instruction files and rejects
+  `--dry-run`, `--diff`, `--update`, and `--force`.
+- Add fixture and golden tests for nested monorepos, unknown manifests, and
+  ambiguous package managers. Generated output is unchanged.
+
 ## 0.2.1 — 2026-11-14
 
 - Rerunning without `--update` on an up-to-date file now reports `Unchanged` and

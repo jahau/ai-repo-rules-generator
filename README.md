@@ -82,6 +82,76 @@ Symlinks, Windows reparse points, and hard-linked destinations are refused.
 `--force` is accepted for compatibility but now means safe `--update`, with a
 warning; there is no destructive overwrite option.
 
+## Explain generated instructions
+
+`--explain` shows which metadata observations produced each generated instruction,
+with a confidence level and the project scope it applies to. It is strictly
+read-only: it does not plan, read, or write instruction files, so it never
+conflicts with existing files and leaves every byte untouched. It cannot be
+combined with `--dry-run`, `--diff`, `--update`, or `--force`; run a normal
+generation command when you want files changed.
+
+```sh
+ai-repo-rules /path/to/project --explain
+ai-repo-rules /path/to/project --agent all --explain --explain-format json
+```
+
+Excerpt for [examples/monorepo](examples/monorepo):
+
+```text
+Scope `apps/web` -> ### `apps/web`
+  Run commands from this project directory.
+      `apps/web` [high]
+        [high] `apps/web/package.json`: recognized manifest present
+  - Languages: `JavaScript`, `TypeScript`.
+      `JavaScript` [high]
+        [high] `apps/web/package.json`: manifest parsed
+      `TypeScript` [high]
+        [high] `apps/web/package.json`: `devDependencies.typescript` declared
+  ...
+  - `pnpm run test` — evidence: `package.json`.
+      `pnpm run test` [medium]
+        [medium] `apps/web/package.json`: script name `scripts.test` matches a check pattern; `pnpm` is the only manager
+```
+
+Each indented instruction line is byte-identical to a line in the generated
+section. Below it, each listed value shows its strongest confidence and every
+supporting observation, using repository-relative paths:
+
+| Confidence | Meaning |
+| --- | --- |
+| `high` | Declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name |
+| `medium` | Inferred from file extensions (with the directories counted) or from a script-name pattern |
+| `low` | Filename-only heuristic that may be coincidental, such as `wp-config-sample.php` |
+
+Lines with nothing detected say `no allowlisted observation`. When scripts are
+omitted, the explanation names the cause, for example "the package manager is
+ambiguous (npm, yarn); no invocation is guessed".
+Fixed template lines (title, safety rules, headings) are listed separately as not
+derived from observations. Detection warnings are printed to stderr as usual and
+repeated in the explanation.
+
+Output is deterministic: identical repository metadata gives identical text or
+JSON in any checkout location. JSON (`"format": "ai-repo-rules-explain/1"`) has
+sorted keys and ASCII escaping, so it is suitable for diffs and CI checks.
+Golden examples for a nested monorepo, unknown manifests, and ambiguous package
+managers live in [tests/golden](tests/golden).
+
+Explanation limitations:
+
+- It explains what the scanner observed, not whether a command works or a
+  framework is actually used. Confidence is a fixed rule per observation kind,
+  not a statistical score.
+- Unrecognized manifests (for example `deno.json`, `pubspec.yaml`, `Makefile`)
+  are not read and never appear. Their directories do not become scopes, and
+  source files there are attributed to the nearest recognized project.
+- Lockfiles and `packageManager` apply only to their own directory. A workspace
+  root's lockfile does not make a nested package's manager unambiguous.
+- Files skipped by exclusions or scan limits are absent from explanations too.
+  Check the warnings.
+- Directory names, dependency keys, and script names can appear in the output;
+  values are shown as sanitized code spans in text mode.
+
 ## Detection support
 
 | Ecosystem | Evidence and scope |
@@ -162,13 +232,13 @@ Full generated samples:
 
 | Exit | Meaning | Action |
 | --- | --- | --- |
-| `0` | Generated, unchanged, or preview completed | Review output; detection warnings may still need attention |
+| `0` | Generated, unchanged, preview, or explanation completed | Review output; detection warnings may still need attention |
 | `2` | Invalid arguments or project path | Check `--help` and the directory |
 | `3` | Existing file, edited block, or unsafe destination | Inspect the file; use `--update --diff` or resolve the reported conflict |
 | `4` | Filesystem I/O failure | Check permissions and disk space; completed writes are rolled back; a rollback failure lists files to inspect |
 
 Missing commands usually mean evidence is absent or the package manager is
-ambiguous. Keep only the intended lockfile/manager declaration and rerun. The tool
+ambiguous; `--explain` names the cause for each scope. Keep only the intended lockfile/manager declaration and rerun. The tool
 does not add missing dependencies or configuration for you.
 
 ## Development and release
@@ -185,7 +255,8 @@ python -m build
 The CI matrix covers Python 3.11–3.14 on Windows, Linux, and macOS, with wheel
 installation and an out-of-checkout CLI smoke test. Tests cover detection,
 previews, legacy invocation, conflict handling, manual-text preservation, unsafe
-paths, and offline execution. Symlink tests skip if the host cannot create links.
+paths, offline execution, and golden `--explain` fixtures (refresh them after an
+intentional change with `UPDATE_GOLDEN=1 python -m pytest tests/test_explain.py`). Symlink tests skip if the host cannot create links.
 
 See [CHANGELOG.md](CHANGELOG.md) and the
 [release checklist](docs/releasing.md). MIT licensed.
