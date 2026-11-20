@@ -1,0 +1,140 @@
+ai-repo-rules explanation (read-only; no files were written)
+Targets: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`
+
+Fixed template lines (identical for every repository; not derived from observations):
+  # Agent instructions
+  # Claude Code instructions
+  # GitHub Copilot instructions
+  Review this locally generated draft before committing.
+  Keep manually maintained instructions outside the generated section.
+  ## Safety and workflow
+  - Read the applicable instructions, README, configuration, and tests before editing.
+  - Make focused changes and preserve existing behavior and manual instructions.
+  - Never print, commit, or copy secrets or private tokens.
+  - Review configured commands before running them; configuration is not trusted code.
+  - Use the environment and tool versions specified by the project.
+  - Run relevant checks when practical; report results and anything unverified.
+  - Do not invent commands, dependencies, or successful test results.
+  ## Detected projects
+  Configured check invocations (availability has not been verified):
+  ## Detection warnings
+
+Scope `.` -> ### `.`
+  Run commands from this project directory.
+      `.` [high]
+        [high] `package.json`: recognized manifest present
+  - Languages: `Go`, `JavaScript`.
+      `Go` [medium]
+        [medium] `*.go` in `tools/codegen`: 1 file(s) with this extension; nearest enclosing project
+      `JavaScript` [high]
+        [high] `package.json`: manifest parsed
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: `pnpm`.
+      `pnpm` [high]
+        [high] `package.json`: `packageManager` field
+        [high] `pnpm-lock.yaml`: lockfile present
+  - Evidence: `package.json`, `pnpm-lock.yaml`.
+      `package.json` [high]
+        [high] `package.json`: recognized manifest present
+      `pnpm-lock.yaml` [high]
+        [high] `pnpm-lock.yaml`: lockfile present
+  No unambiguous check commands detected. Inspect project configuration.
+      no allowlisted observation
+
+Scope `packages/legacy-cli` -> ### `packages/legacy-cli`
+  Run commands from this project directory.
+      `packages/legacy-cli` [high]
+        [high] `packages/legacy-cli/package.json`: recognized manifest present
+  - Languages: `JavaScript`.
+      `JavaScript` [high]
+        [high] `packages/legacy-cli/package.json`: manifest parsed
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: not detected.
+      no allowlisted observation
+  - Evidence: `package.json`.
+      `package.json` [high]
+        [high] `packages/legacy-cli/package.json`: recognized manifest present
+  No unambiguous check commands detected. Inspect project configuration.
+      `package.json scripts` [high]
+        [high] `packages/legacy-cli/package.json`: `scripts` declared but the package manager is missing; no invocation is guessed
+
+Scope `packages/ui` -> ### `packages/ui`
+  Run commands from this project directory.
+      `packages/ui` [high]
+        [high] `packages/ui/package.json`: recognized manifest present
+  - Languages: `JavaScript`, `TypeScript`.
+      `JavaScript` [high]
+        [high] `packages/ui/package.json`: manifest parsed
+        [medium] `*.js` in `packages/ui/legacy`: 1 file(s) with this extension; nearest enclosing project
+      `TypeScript` [high]
+        [high] `packages/ui/package.json`: `devDependencies.typescript` declared
+        [medium] `*.tsx` in `packages/ui/src`, `packages/ui/src/icons/deep`: 2 file(s) with this extension; nearest enclosing project
+  - Frameworks: `React`.
+      `React` [high]
+        [high] `packages/ui/package.json`: `dependencies.react` declared
+  - Package managers: `pnpm`.
+      `pnpm` [high]
+        [high] `packages/ui/package.json`: `packageManager` field
+  - Evidence: `package.json`.
+      `package.json` [high]
+        [high] `packages/ui/package.json`: recognized manifest present
+  - `pnpm run lint` — evidence: `package.json`.
+      `pnpm run lint` [medium]
+        [medium] `packages/ui/package.json`: script name `scripts.lint` matches a check pattern; `pnpm` is the only manager
+  - `pnpm run test` — evidence: `package.json`.
+      `pnpm run test` [medium]
+        [medium] `packages/ui/package.json`: script name `scripts.test` matches a check pattern; `pnpm` is the only manager
+
+Scope `services/api` -> ### `services/api`
+  Run commands from this project directory.
+      `services/api` [high]
+        [high] `services/api/pyproject.toml`: recognized manifest present
+  - Languages: `Python`.
+      `Python` [high]
+        [high] `services/api/pyproject.toml`: manifest filename
+        [medium] `*.py` in `services/api/app`: 1 file(s) with this extension; nearest enclosing project
+  - Frameworks: `Django`.
+      `Django` [high]
+        [high] `services/api/pyproject.toml`: `project.dependencies` lists `django`
+  - Package managers: `uv`.
+      `uv` [high]
+        [high] `services/api/pyproject.toml`: `[tool.uv]` table
+        [high] `services/api/uv.lock`: lockfile present
+  - Evidence: `pyproject.toml`, `uv.lock`.
+      `pyproject.toml` [high]
+        [high] `services/api/pyproject.toml`: recognized manifest present
+      `uv.lock` [high]
+        [high] `services/api/uv.lock`: lockfile present
+  - `python -m pytest` — evidence: `pyproject.toml [tool.pytest]`.
+      `python -m pytest` [high]
+        [high] `services/api/pyproject.toml`: `[tool.pytest]` table configured
+
+Scope `services/api/plugins/payments` -> ### `services/api/plugins/payments`
+  Run commands from this project directory.
+      `services/api/plugins/payments` [high]
+        [high] `services/api/plugins/payments/pyproject.toml`: recognized manifest present
+  - Languages: `Python`.
+      `Python` [high]
+        [high] `services/api/plugins/payments/pyproject.toml`: manifest filename
+        [medium] `*.py` in `services/api/plugins/payments`: 1 file(s) with this extension; nearest enclosing project
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: not detected.
+      no allowlisted observation
+  - Evidence: `pyproject.toml`.
+      `pyproject.toml` [high]
+        [high] `services/api/plugins/payments/pyproject.toml`: recognized manifest present
+  - `ruff check .` — evidence: `pyproject.toml [tool.ruff]`.
+      `ruff check .` [high]
+        [high] `services/api/plugins/payments/pyproject.toml`: `[tool.ruff]` table configured
+
+Detection warnings (listed verbatim in the generated section):
+  - `packages/legacy-cli: package manager missing or ambiguous; scripts omitted`
+      raised while scanning
+
+Confidence levels:
+  high: declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name
+  medium: inferred from file extensions or from a script-name pattern
+  low: filename-only heuristic that may be coincidental

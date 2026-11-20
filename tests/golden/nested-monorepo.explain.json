@@ -1,0 +1,624 @@
+{
+  "confidence_levels": {
+    "high": "declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name",
+    "low": "filename-only heuristic that may be coincidental",
+    "medium": "inferred from file extensions or from a script-name pattern"
+  },
+  "format": "ai-repo-rules-explain/1",
+  "projects": [
+    {
+      "heading": "### `.`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "package.json"
+                }
+              ],
+              "value": "."
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `Go`, `JavaScript`.",
+          "values": [
+            {
+              "confidence": "medium",
+              "observations": [
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "tools/codegen"
+                  ],
+                  "source": "*.go"
+                }
+              ],
+              "value": "Go"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "package.json"
+                }
+              ],
+              "value": "JavaScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `pnpm`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`packageManager` field",
+                  "source": "package.json"
+                },
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "pnpm-lock.yaml"
+                }
+              ],
+              "value": "pnpm"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package.json`, `pnpm-lock.yaml`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "package.json"
+                }
+              ],
+              "value": "package.json"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "pnpm-lock.yaml"
+                }
+              ],
+              "value": "pnpm-lock.yaml"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": []
+        }
+      ],
+      "scope": "."
+    },
+    {
+      "heading": "### `packages/legacy-cli`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "packages/legacy-cli/package.json"
+                }
+              ],
+              "value": "packages/legacy-cli"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `JavaScript`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "packages/legacy-cli/package.json"
+                }
+              ],
+              "value": "JavaScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: not detected.",
+          "values": []
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package.json`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "packages/legacy-cli/package.json"
+                }
+              ],
+              "value": "package.json"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`scripts` declared but the package manager is missing; no invocation is guessed",
+                  "source": "packages/legacy-cli/package.json"
+                }
+              ],
+              "value": "package.json scripts"
+            }
+          ]
+        }
+      ],
+      "scope": "packages/legacy-cli"
+    },
+    {
+      "heading": "### `packages/ui`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "packages/ui/package.json"
+                }
+              ],
+              "value": "packages/ui"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `JavaScript`, `TypeScript`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "packages/ui/package.json"
+                },
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "packages/ui/legacy"
+                  ],
+                  "source": "*.js"
+                }
+              ],
+              "value": "JavaScript"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`devDependencies.typescript` declared",
+                  "source": "packages/ui/package.json"
+                },
+                {
+                  "confidence": "medium",
+                  "detail": "2 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "packages/ui/src",
+                    "packages/ui/src/icons/deep"
+                  ],
+                  "source": "*.tsx"
+                }
+              ],
+              "value": "TypeScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: `React`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`dependencies.react` declared",
+                  "source": "packages/ui/package.json"
+                }
+              ],
+              "value": "React"
+            }
+          ]
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `pnpm`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`packageManager` field",
+                  "source": "packages/ui/package.json"
+                }
+              ],
+              "value": "pnpm"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package.json`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "packages/ui/package.json"
+                }
+              ],
+              "value": "package.json"
+            }
+          ]
+        },
+        {
+          "field": "commands",
+          "instruction": "- `pnpm run lint` \u2014 evidence: `package.json`.",
+          "values": [
+            {
+              "confidence": "medium",
+              "observations": [
+                {
+                  "confidence": "medium",
+                  "detail": "script name `scripts.lint` matches a check pattern; `pnpm` is the only manager",
+                  "source": "packages/ui/package.json"
+                }
+              ],
+              "value": "pnpm run lint"
+            }
+          ]
+        },
+        {
+          "field": "commands",
+          "instruction": "- `pnpm run test` \u2014 evidence: `package.json`.",
+          "values": [
+            {
+              "confidence": "medium",
+              "observations": [
+                {
+                  "confidence": "medium",
+                  "detail": "script name `scripts.test` matches a check pattern; `pnpm` is the only manager",
+                  "source": "packages/ui/package.json"
+                }
+              ],
+              "value": "pnpm run test"
+            }
+          ]
+        }
+      ],
+      "scope": "packages/ui"
+    },
+    {
+      "heading": "### `services/api`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "services/api/pyproject.toml"
+                }
+              ],
+              "value": "services/api"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `Python`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest filename",
+                  "source": "services/api/pyproject.toml"
+                },
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "services/api/app"
+                  ],
+                  "source": "*.py"
+                }
+              ],
+              "value": "Python"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: `Django`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`project.dependencies` lists `django`",
+                  "source": "services/api/pyproject.toml"
+                }
+              ],
+              "value": "Django"
+            }
+          ]
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `uv`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`[tool.uv]` table",
+                  "source": "services/api/pyproject.toml"
+                },
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "services/api/uv.lock"
+                }
+              ],
+              "value": "uv"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `pyproject.toml`, `uv.lock`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "services/api/pyproject.toml"
+                }
+              ],
+              "value": "pyproject.toml"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "services/api/uv.lock"
+                }
+              ],
+              "value": "uv.lock"
+            }
+          ]
+        },
+        {
+          "field": "commands",
+          "instruction": "- `python -m pytest` \u2014 evidence: `pyproject.toml [tool.pytest]`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`[tool.pytest]` table configured",
+                  "source": "services/api/pyproject.toml"
+                }
+              ],
+              "value": "python -m pytest"
+            }
+          ]
+        }
+      ],
+      "scope": "services/api"
+    },
+    {
+      "heading": "### `services/api/plugins/payments`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "services/api/plugins/payments/pyproject.toml"
+                }
+              ],
+              "value": "services/api/plugins/payments"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `Python`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest filename",
+                  "source": "services/api/plugins/payments/pyproject.toml"
+                },
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "services/api/plugins/payments"
+                  ],
+                  "source": "*.py"
+                }
+              ],
+              "value": "Python"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: not detected.",
+          "values": []
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `pyproject.toml`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "services/api/plugins/payments/pyproject.toml"
+                }
+              ],
+              "value": "pyproject.toml"
+            }
+          ]
+        },
+        {
+          "field": "commands",
+          "instruction": "- `ruff check .` \u2014 evidence: `pyproject.toml [tool.ruff]`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`[tool.ruff]` table configured",
+                  "source": "services/api/plugins/payments/pyproject.toml"
+                }
+              ],
+              "value": "ruff check ."
+            }
+          ]
+        }
+      ],
+      "scope": "services/api/plugins/payments"
+    }
+  ],
+  "read_only": true,
+  "targets": [
+    {
+      "agent": "codex",
+      "path": "AGENTS.md"
+    },
+    {
+      "agent": "claude",
+      "path": "CLAUDE.md"
+    },
+    {
+      "agent": "copilot",
+      "path": ".github/copilot-instructions.md"
+    }
+  ],
+  "template": [
+    "# Agent instructions",
+    "# Claude Code instructions",
+    "# GitHub Copilot instructions",
+    "Review this locally generated draft before committing.",
+    "Keep manually maintained instructions outside the generated section.",
+    "## Safety and workflow",
+    "- Read the applicable instructions, README, configuration, and tests before editing.",
+    "- Make focused changes and preserve existing behavior and manual instructions.",
+    "- Never print, commit, or copy secrets or private tokens.",
+    "- Review configured commands before running them; configuration is not trusted code.",
+    "- Use the environment and tool versions specified by the project.",
+    "- Run relevant checks when practical; report results and anything unverified.",
+    "- Do not invent commands, dependencies, or successful test results.",
+    "## Detected projects",
+    "Configured check invocations (availability has not been verified):",
+    "## Detection warnings"
+  ],
+  "warnings": [
+    {
+      "basis": "raised while scanning",
+      "instruction": "- `packages/legacy-cli: package manager missing or ambiguous; scripts omitted`"
+    }
+  ]
+}

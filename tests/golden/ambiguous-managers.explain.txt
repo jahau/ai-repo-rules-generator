@@ -1,0 +1,136 @@
+ai-repo-rules explanation (read-only; no files were written)
+Targets: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`
+
+Fixed template lines (identical for every repository; not derived from observations):
+  # Agent instructions
+  # Claude Code instructions
+  # GitHub Copilot instructions
+  Review this locally generated draft before committing.
+  Keep manually maintained instructions outside the generated section.
+  ## Safety and workflow
+  - Read the applicable instructions, README, configuration, and tests before editing.
+  - Make focused changes and preserve existing behavior and manual instructions.
+  - Never print, commit, or copy secrets or private tokens.
+  - Review configured commands before running them; configuration is not trusted code.
+  - Use the environment and tool versions specified by the project.
+  - Run relevant checks when practical; report results and anything unverified.
+  - Do not invent commands, dependencies, or successful test results.
+  ## Detected projects
+  Configured check invocations (availability has not been verified):
+  ## Detection warnings
+
+Scope `.` -> ### `.`
+  Run commands from this project directory.
+      `.` [high]
+        [high] `.`: repository root is always a scope
+  - Languages: not detected.
+      no allowlisted observation
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: not detected.
+      no allowlisted observation
+  - Evidence: not detected.
+      no allowlisted observation
+  No unambiguous check commands detected. Inspect project configuration.
+      no allowlisted observation
+
+Scope `agreeing` -> ### `agreeing`
+  Run commands from this project directory.
+      `agreeing` [high]
+        [high] `agreeing/package.json`: recognized manifest present
+  - Languages: `JavaScript`.
+      `JavaScript` [high]
+        [high] `agreeing/package.json`: manifest parsed
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: `yarn`.
+      `yarn` [high]
+        [high] `agreeing/package.json`: `packageManager` field
+        [high] `agreeing/yarn.lock`: lockfile present
+  - Evidence: `package.json`, `yarn.lock`.
+      `package.json` [high]
+        [high] `agreeing/package.json`: recognized manifest present
+      `yarn.lock` [high]
+        [high] `agreeing/yarn.lock`: lockfile present
+  - `yarn run test` — evidence: `package.json`.
+      `yarn run test` [medium]
+        [medium] `agreeing/package.json`: script name `scripts.test` matches a check pattern; `yarn` is the only manager
+
+Scope `field-vs-lockfile` -> ### `field-vs-lockfile`
+  Run commands from this project directory.
+      `field-vs-lockfile` [high]
+        [high] `field-vs-lockfile/package.json`: recognized manifest present
+  - Languages: `JavaScript`.
+      `JavaScript` [high]
+        [high] `field-vs-lockfile/package.json`: manifest parsed
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: `pnpm`, `yarn`.
+      `pnpm` [high]
+        [high] `field-vs-lockfile/package.json`: `packageManager` field
+      `yarn` [high]
+        [high] `field-vs-lockfile/yarn.lock`: lockfile present
+  - Evidence: `package.json`, `yarn.lock`.
+      `package.json` [high]
+        [high] `field-vs-lockfile/package.json`: recognized manifest present
+      `yarn.lock` [high]
+        [high] `field-vs-lockfile/yarn.lock`: lockfile present
+  No unambiguous check commands detected. Inspect project configuration.
+      `package.json scripts` [high]
+        [high] `field-vs-lockfile/package.json`: `scripts` declared but the package manager is ambiguous (pnpm, yarn); no invocation is guessed
+
+Scope `no-manager` -> ### `no-manager`
+  Run commands from this project directory.
+      `no-manager` [high]
+        [high] `no-manager/package.json`: recognized manifest present
+  - Languages: `JavaScript`.
+      `JavaScript` [high]
+        [high] `no-manager/package.json`: manifest parsed
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: not detected.
+      no allowlisted observation
+  - Evidence: `package.json`.
+      `package.json` [high]
+        [high] `no-manager/package.json`: recognized manifest present
+  No unambiguous check commands detected. Inspect project configuration.
+      `package.json scripts` [high]
+        [high] `no-manager/package.json`: `scripts` declared but the package manager is missing; no invocation is guessed
+
+Scope `two-lockfiles` -> ### `two-lockfiles`
+  Run commands from this project directory.
+      `two-lockfiles` [high]
+        [high] `two-lockfiles/package.json`: recognized manifest present
+  - Languages: `JavaScript`.
+      `JavaScript` [high]
+        [high] `two-lockfiles/package.json`: manifest parsed
+  - Frameworks: not detected.
+      no allowlisted observation
+  - Package managers: `npm`, `yarn`.
+      `npm` [high]
+        [high] `two-lockfiles/package-lock.json`: lockfile present
+      `yarn` [high]
+        [high] `two-lockfiles/yarn.lock`: lockfile present
+  - Evidence: `package-lock.json`, `package.json`, `yarn.lock`.
+      `package-lock.json` [high]
+        [high] `two-lockfiles/package-lock.json`: lockfile present
+      `package.json` [high]
+        [high] `two-lockfiles/package.json`: recognized manifest present
+      `yarn.lock` [high]
+        [high] `two-lockfiles/yarn.lock`: lockfile present
+  No unambiguous check commands detected. Inspect project configuration.
+      `package.json scripts` [high]
+        [high] `two-lockfiles/package.json`: `scripts` declared but the package manager is ambiguous (npm, yarn); no invocation is guessed
+
+Detection warnings (listed verbatim in the generated section):
+  - `field-vs-lockfile: package manager missing or ambiguous; scripts omitted`
+      raised while scanning
+  - `no-manager: package manager missing or ambiguous; scripts omitted`
+      raised while scanning
+  - `two-lockfiles: package manager missing or ambiguous; scripts omitted`
+      raised while scanning
+
+Confidence levels:
+  high: declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name
+  medium: inferred from file extensions or from a script-name pattern
+  low: filename-only heuristic that may be coincidental

@@ -1,0 +1,240 @@
+{
+  "confidence_levels": {
+    "high": "declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name",
+    "low": "filename-only heuristic that may be coincidental",
+    "medium": "inferred from file extensions or from a script-name pattern"
+  },
+  "format": "ai-repo-rules-explain/1",
+  "projects": [
+    {
+      "heading": "### `.`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "repository root is always a scope",
+                  "source": "."
+                }
+              ],
+              "value": "."
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `PHP`, `TypeScript`.",
+          "values": [
+            {
+              "confidence": "medium",
+              "observations": [
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "."
+                  ],
+                  "source": "*.php"
+                },
+                {
+                  "confidence": "low",
+                  "detail": "filename only; contents are never read",
+                  "source": "wp-config-sample.php"
+                }
+              ],
+              "value": "PHP"
+            },
+            {
+              "confidence": "medium",
+              "observations": [
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "scripts"
+                  ],
+                  "source": "*.ts"
+                }
+              ],
+              "value": "TypeScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: `WordPress`.",
+          "values": [
+            {
+              "confidence": "low",
+              "observations": [
+                {
+                  "confidence": "low",
+                  "detail": "filename only; contents are never read",
+                  "source": "wp-config-sample.php"
+                }
+              ],
+              "value": "WordPress"
+            }
+          ]
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: not detected.",
+          "values": []
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `wp-config-sample.php (filename only)`.",
+          "values": [
+            {
+              "confidence": "low",
+              "observations": [
+                {
+                  "confidence": "low",
+                  "detail": "filename only; contents are never read",
+                  "source": "wp-config-sample.php"
+                }
+              ],
+              "value": "wp-config-sample.php (filename only)"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": []
+        }
+      ],
+      "scope": "."
+    },
+    {
+      "heading": "### `known`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "known/go.mod"
+                }
+              ],
+              "value": "known"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `Go`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest filename",
+                  "source": "known/go.mod"
+                },
+                {
+                  "confidence": "medium",
+                  "detail": "1 file(s) with this extension; nearest enclosing project",
+                  "directories": [
+                    "known"
+                  ],
+                  "source": "*.go"
+                }
+              ],
+              "value": "Go"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `Go modules`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest filename",
+                  "source": "known/go.mod"
+                }
+              ],
+              "value": "Go modules"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `go.mod`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "known/go.mod"
+                }
+              ],
+              "value": "go.mod"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": []
+        }
+      ],
+      "scope": "known"
+    }
+  ],
+  "read_only": true,
+  "targets": [
+    {
+      "agent": "codex",
+      "path": "AGENTS.md"
+    },
+    {
+      "agent": "claude",
+      "path": "CLAUDE.md"
+    },
+    {
+      "agent": "copilot",
+      "path": ".github/copilot-instructions.md"
+    }
+  ],
+  "template": [
+    "# Agent instructions",
+    "# Claude Code instructions",
+    "# GitHub Copilot instructions",
+    "Review this locally generated draft before committing.",
+    "Keep manually maintained instructions outside the generated section.",
+    "## Safety and workflow",
+    "- Read the applicable instructions, README, configuration, and tests before editing.",
+    "- Make focused changes and preserve existing behavior and manual instructions.",
+    "- Never print, commit, or copy secrets or private tokens.",
+    "- Review configured commands before running them; configuration is not trusted code.",
+    "- Use the environment and tool versions specified by the project.",
+    "- Run relevant checks when practical; report results and anything unverified.",
+    "- Do not invent commands, dependencies, or successful test results.",
+    "## Detected projects"
+  ],
+  "warnings": []
+}

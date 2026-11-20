@@ -1,0 +1,8 @@
+[project]
+name = "api"
+dependencies = ["django>=5"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv]

@@ -1,0 +1,548 @@
+{
+  "confidence_levels": {
+    "high": "declared in a parsed allowlisted manifest field, or implied by a recognized manifest or lockfile name",
+    "low": "filename-only heuristic that may be coincidental",
+    "medium": "inferred from file extensions or from a script-name pattern"
+  },
+  "format": "ai-repo-rules-explain/1",
+  "projects": [
+    {
+      "heading": "### `.`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "repository root is always a scope",
+                  "source": "."
+                }
+              ],
+              "value": "."
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: not detected.",
+          "values": []
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: not detected.",
+          "values": []
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: not detected.",
+          "values": []
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": []
+        }
+      ],
+      "scope": "."
+    },
+    {
+      "heading": "### `agreeing`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "agreeing/package.json"
+                }
+              ],
+              "value": "agreeing"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `JavaScript`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "agreeing/package.json"
+                }
+              ],
+              "value": "JavaScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `yarn`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`packageManager` field",
+                  "source": "agreeing/package.json"
+                },
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "agreeing/yarn.lock"
+                }
+              ],
+              "value": "yarn"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package.json`, `yarn.lock`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "agreeing/package.json"
+                }
+              ],
+              "value": "package.json"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "agreeing/yarn.lock"
+                }
+              ],
+              "value": "yarn.lock"
+            }
+          ]
+        },
+        {
+          "field": "commands",
+          "instruction": "- `yarn run test` \u2014 evidence: `package.json`.",
+          "values": [
+            {
+              "confidence": "medium",
+              "observations": [
+                {
+                  "confidence": "medium",
+                  "detail": "script name `scripts.test` matches a check pattern; `yarn` is the only manager",
+                  "source": "agreeing/package.json"
+                }
+              ],
+              "value": "yarn run test"
+            }
+          ]
+        }
+      ],
+      "scope": "agreeing"
+    },
+    {
+      "heading": "### `field-vs-lockfile`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "field-vs-lockfile/package.json"
+                }
+              ],
+              "value": "field-vs-lockfile"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `JavaScript`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "field-vs-lockfile/package.json"
+                }
+              ],
+              "value": "JavaScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `pnpm`, `yarn`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`packageManager` field",
+                  "source": "field-vs-lockfile/package.json"
+                }
+              ],
+              "value": "pnpm"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "field-vs-lockfile/yarn.lock"
+                }
+              ],
+              "value": "yarn"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package.json`, `yarn.lock`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "field-vs-lockfile/package.json"
+                }
+              ],
+              "value": "package.json"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "field-vs-lockfile/yarn.lock"
+                }
+              ],
+              "value": "yarn.lock"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`scripts` declared but the package manager is ambiguous (pnpm, yarn); no invocation is guessed",
+                  "source": "field-vs-lockfile/package.json"
+                }
+              ],
+              "value": "package.json scripts"
+            }
+          ]
+        }
+      ],
+      "scope": "field-vs-lockfile"
+    },
+    {
+      "heading": "### `no-manager`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "no-manager/package.json"
+                }
+              ],
+              "value": "no-manager"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `JavaScript`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "no-manager/package.json"
+                }
+              ],
+              "value": "JavaScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: not detected.",
+          "values": []
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package.json`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "no-manager/package.json"
+                }
+              ],
+              "value": "package.json"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`scripts` declared but the package manager is missing; no invocation is guessed",
+                  "source": "no-manager/package.json"
+                }
+              ],
+              "value": "package.json scripts"
+            }
+          ]
+        }
+      ],
+      "scope": "no-manager"
+    },
+    {
+      "heading": "### `two-lockfiles`",
+      "instructions": [
+        {
+          "field": "scope",
+          "instruction": "Run commands from this project directory.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "two-lockfiles/package.json"
+                }
+              ],
+              "value": "two-lockfiles"
+            }
+          ]
+        },
+        {
+          "field": "languages",
+          "instruction": "- Languages: `JavaScript`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "manifest parsed",
+                  "source": "two-lockfiles/package.json"
+                }
+              ],
+              "value": "JavaScript"
+            }
+          ]
+        },
+        {
+          "field": "frameworks",
+          "instruction": "- Frameworks: not detected.",
+          "values": []
+        },
+        {
+          "field": "managers",
+          "instruction": "- Package managers: `npm`, `yarn`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "two-lockfiles/package-lock.json"
+                }
+              ],
+              "value": "npm"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "two-lockfiles/yarn.lock"
+                }
+              ],
+              "value": "yarn"
+            }
+          ]
+        },
+        {
+          "field": "evidence",
+          "instruction": "- Evidence: `package-lock.json`, `package.json`, `yarn.lock`.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "two-lockfiles/package-lock.json"
+                }
+              ],
+              "value": "package-lock.json"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "recognized manifest present",
+                  "source": "two-lockfiles/package.json"
+                }
+              ],
+              "value": "package.json"
+            },
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "lockfile present",
+                  "source": "two-lockfiles/yarn.lock"
+                }
+              ],
+              "value": "yarn.lock"
+            }
+          ]
+        },
+        {
+          "field": "omissions",
+          "instruction": "No unambiguous check commands detected. Inspect project configuration.",
+          "values": [
+            {
+              "confidence": "high",
+              "observations": [
+                {
+                  "confidence": "high",
+                  "detail": "`scripts` declared but the package manager is ambiguous (npm, yarn); no invocation is guessed",
+                  "source": "two-lockfiles/package.json"
+                }
+              ],
+              "value": "package.json scripts"
+            }
+          ]
+        }
+      ],
+      "scope": "two-lockfiles"
+    }
+  ],
+  "read_only": true,
+  "targets": [
+    {
+      "agent": "codex",
+      "path": "AGENTS.md"
+    },
+    {
+      "agent": "claude",
+      "path": "CLAUDE.md"
+    },
+    {
+      "agent": "copilot",
+      "path": ".github/copilot-instructions.md"
+    }
+  ],
+  "template": [
+    "# Agent instructions",
+    "# Claude Code instructions",
+    "# GitHub Copilot instructions",
+    "Review this locally generated draft before committing.",
+    "Keep manually maintained instructions outside the generated section.",
+    "## Safety and workflow",
+    "- Read the applicable instructions, README, configuration, and tests before editing.",
+    "- Make focused changes and preserve existing behavior and manual instructions.",
+    "- Never print, commit, or copy secrets or private tokens.",
+    "- Review configured commands before running them; configuration is not trusted code.",
+    "- Use the environment and tool versions specified by the project.",
+    "- Run relevant checks when practical; report results and anything unverified.",
+    "- Do not invent commands, dependencies, or successful test results.",
+    "## Detected projects",
+    "Configured check invocations (availability has not been verified):",
+    "## Detection warnings"
+  ],
+  "warnings": [
+    {
+      "basis": "raised while scanning",
+      "instruction": "- `field-vs-lockfile: package manager missing or ambiguous; scripts omitted`"
+    },
+    {
+      "basis": "raised while scanning",
+      "instruction": "- `no-manager: package manager missing or ambiguous; scripts omitted`"
+    },
+    {
+      "basis": "raised while scanning",
+      "instruction": "- `two-lockfiles: package manager missing or ambiguous; scripts omitted`"
+    }
+  ]
+}
